@@ -1,0 +1,56 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+
+# Environment variables
+.env
+
+# Storage directories
+storage/uploads/*
+storage/processed/*
+storage/thumbnails/*
+!storage/uploads/.gitkeep
+!storage/processed/.gitkeep
+!storage/thumbnails/.gitkeep
+
+# Temporary files
+/tmp/
+*.tmp
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+/bin/
+/dist/
+/build/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+
+#github 
+.github/prompts
