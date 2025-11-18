@@ -54,3 +54,6 @@ Thumbs.db
 
 #github 
 .github/prompts
+# Test files
+sample.mp4
+*.mp4
