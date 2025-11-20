@@ -219,17 +219,40 @@ func (s *ProcessingService) executeTranscode(ctx context.Context, jobID string, 
 	outputFilename := fmt.Sprintf("%s_transcoded_%s.%s", filepath.Base(video.FilePath[:len(video.FilePath)-len(filepath.Ext(video.FilePath))]), params.Resolution, ext)
 	outputPath := filepath.Join(s.config.Storage.ProcessedDir, outputFilename)
 
+	// Determine codecs based on output format
+	videoCodec := s.config.FFmpeg.DefaultCodec
+	audioCodec := s.config.FFmpeg.DefaultAudioCodec
+
+	// WebM format requires VP8/VP9 for video and Vorbis/Opus for audio
+	if ext == "webm" {
+		videoCodec = "libvpx-vp9" // VP9 codec for WebM
+		audioCodec = "libopus"    // Opus codec for WebM
+	} else if ext == "mp4" {
+		videoCodec = "libx264" // H.264 for MP4
+		audioCodec = "aac"     // AAC for MP4
+	} else if ext == "mkv" {
+		videoCodec = "libx265" // H.265 for MKV
+		audioCodec = "aac"
+	}
+
 	// Prepare transcode options
 	opts := processor.TranscodeOptions{
 		OutputPath: outputPath,
-		VideoCodec: s.config.FFmpeg.DefaultCodec,
-		AudioCodec: s.config.FFmpeg.DefaultAudioCodec,
+		VideoCodec: videoCodec,
+		AudioCodec: audioCodec,
 		Resolution: processor.GetResolutionString(params.Resolution),
 		Preset:     "medium",
 	}
 
 	if params.Quality > 0 {
 		opts.CRF = params.Quality
+	} else {
+		// Set default CRF based on format
+		if ext == "webm" {
+			opts.CRF = 31 // VP9 default quality (0-63 range)
+		} else {
+			opts.CRF = 23 // H.264/H.265 default quality (0-51 range)
+		}
 	}
 
 	// Execute transcoding
